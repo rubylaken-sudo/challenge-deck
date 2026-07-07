@@ -28,16 +28,14 @@ const PUBLIC = path.join(__dirname, 'public');
 //   duration = countdown length in SECONDS; 0 = no timer (stays until cleared)
 //   endsAt   = timestamp the timer expires (managed at runtime)
 let challenges = [
-  { id: 1,  tag: 'BUILD', title: 'No Builds',        sub: 'Win a fight without placing a single build', duration: 180, active: false, endsAt: null },
-  { id: 2,  tag: 'AIM',   title: 'Pistols Only',     sub: 'Eliminations with pistols only', duration: 300, active: false, endsAt: null },
-  { id: 3,  tag: 'PACE',  title: 'First to 5 Elims', sub: 'Rush to five eliminations this match', duration: 0, active: false, endsAt: null },
-  { id: 4,  tag: 'RISK',  title: 'Hot Drop',         sub: 'Land at the busiest named POI every game', duration: 0, active: false, endsAt: null },
-  { id: 5,  tag: 'RISK',  title: 'No Healing',       sub: 'Survive 3 minutes without using any heals', duration: 180, active: false, endsAt: null },
-  { id: 6,  tag: 'BUILD', title: 'Drop all Loot',    sub: 'Drop your entire inventory on command', duration: 0, active: false, endsAt: null },
-  { id: 7,  tag: 'STYLE', title: 'Default Skin',     sub: 'Play the whole match as the default skin', duration: 0, active: false, endsAt: null },
-  { id: 8,  tag: 'PACE',  title: 'Storm Surge',      sub: 'Win the Storm Surge damage check', duration: 300, active: false, endsAt: null },
-  { id: 9,  tag: 'LOOT',  title: '30s Drop',         sub: 'Land and fully loot within 30 seconds', duration: 30, active: false, endsAt: null },
-  { id: 10, tag: 'AIM',   title: 'Sniper Only',      sub: 'Eliminations with snipers only', duration: 300, active: false, endsAt: null },
+  { id: 1,  tag: 'DROP',  title: 'Choose Next Drop Spot', sub: 'Squad votes and lands at a chosen POI', active: false },
+  { id: 2,  tag: 'AIM',   title: 'One Gun Only Challenge', sub: 'Eliminations with a single weapon type', active: false },
+  { id: 3,  tag: 'CHAT',  title: "Don't Say Normie", sub: 'Say the word and the challenge is failed', active: false },
+  { id: 4,  tag: 'RISK',  title: 'Hot Drop',         sub: 'Land at the busiest named POI every game', active: false },
+  { id: 5,  tag: 'STYLE', title: 'Choose My Skin',   sub: 'Chat picks the skin for the next match', active: false },
+  { id: 6,  tag: 'BUILD', title: 'Drop all Loot',    sub: 'Drop your entire inventory on command', active: false },
+  { id: 7,  tag: 'CHILL', title: 'No Challenges This Match', sub: 'A free match — no challenges allowed', active: false },
+  { id: 8,  tag: 'PACE',  title: 'Random Fill Game', sub: 'Queue with random fills for the match', active: false },
 ];
 
 // ---- Static file server ----------------------------------------------------
@@ -83,36 +81,16 @@ wss.on('connection', (ws) => {
     try { msg = JSON.parse(raw); } catch { return; }
 
     if (msg.type === 'toggle') {
-      challenges = challenges.map(c => {
-        if (c.id !== msg.id) return c;
-        const active = !c.active;
-        return { ...c, active, endsAt: active && c.duration > 0 ? Date.now() + c.duration * 1000 : null };
-      });
-      broadcast();
-    } else if (msg.type === 'addtime') {
-      // extend a running timer by msg.seconds (default 60)
-      challenges = challenges.map(c =>
-        (c.id === msg.id && c.active && c.endsAt)
-          ? { ...c, endsAt: c.endsAt + (msg.seconds || 60) * 1000 } : c);
+      challenges = challenges.map(c => c.id === msg.id ? { ...c, active: !c.active } : c);
       broadcast();
     } else if (msg.type === 'clear') {
-      challenges = challenges.map(c => ({ ...c, active: false, endsAt: null }));
+      challenges = challenges.map(c => ({ ...c, active: false }));
       broadcast();
     }
   });
 });
 
 server.listen(PORT, () => {
-  // Auto-expire timed challenges and broadcast when one runs out.
-  setInterval(() => {
-    const now = Date.now();
-    if (challenges.some(c => c.active && c.endsAt && c.endsAt <= now)) {
-      challenges = challenges.map(c =>
-        (c.active && c.endsAt && c.endsAt <= now) ? { ...c, active: false, endsAt: null } : c);
-      broadcast();
-    }
-  }, 1000);
-
   console.log(`\n  Challenge Deck running`);
   console.log(`  ├─ Control panel : http://localhost:${PORT}/`);
   console.log(`  └─ OBS overlay   : http://localhost:${PORT}/overlay\n`);

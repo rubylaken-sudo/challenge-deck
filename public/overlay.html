@@ -42,7 +42,7 @@
   .item .meta{display:flex;flex-direction:column;gap:1px;min-width:0;flex:1}
   .item .tag{font-family:'JetBrains Mono',monospace;font-size:9px;font-weight:600;letter-spacing:1.5px;color:var(--accent)}
   .item .title{font-weight:600;font-size:15px;line-height:1.25}
-  .item .timer{font-family:'JetBrains Mono',monospace;font-size:13px;font-weight:600;color:var(--accent);flex:none;margin-top:1px;font-variant-numeric:tabular-nums}
+
 </style>
 </head>
 <body>
@@ -78,9 +78,7 @@
   }
 
   function render(challenges) {
-    latest = challenges;
     const active = challenges.filter(c => c.active);
-    const now = Date.now();
     document.getElementById('cnt').textContent = active.length;
     panel.classList.toggle('hidden', active.length === 0);
     itemsEl.innerHTML = '';
@@ -92,20 +90,9 @@
         '<span class="title"></span></div>';
       if (showTags) el.querySelector('.tag').textContent = c.tag;
       el.querySelector('.title').textContent = c.title;
-      if (c.duration > 0 && c.endsAt) {
-        const t = document.createElement('span');
-        t.className = 'timer';
-        t.textContent = fmt(c.endsAt - now);
-        el.appendChild(t);
-      }
       itemsEl.appendChild(el);
     }
   }
-
-  // Keep countdowns ticking between server messages.
-  setInterval(() => {
-    if (latest.some(c => c.active && c.duration > 0 && c.endsAt)) render(latest);
-  }, 1000);
 
   function connect() {
     const proto = location.protocol === 'https:' ? 'wss' : 'ws';

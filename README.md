@@ -63,21 +63,10 @@ Add query params to the **overlay** URL in OBS:
 
 Combine them: `…/overlay?corner=bottom-left&accent=%23ff3b6b&tags=0`
 
-## Countdown timers
-
-Each challenge has a `duration` (seconds) in `server.js`:
-
-- **`duration > 0`** → activating it starts a countdown shown on the control panel
-  and the overlay. When it hits `0:00` the challenge auto-deactivates and
-  disappears from the overlay. Hit **+1:00** on the control card to extend a
-  running timer.
-- **`duration: 0`** → no timer; the challenge stays live until you click it off
-  or hit Clear all (good for whole-match or one-shot challenges).
-
 ## Edit your challenges
 
 Open `server.js` and edit the `challenges` array near the top — titles,
-descriptions, category tags, and `duration` all live there. Restart to apply.
+descriptions, and category tags all live there. Restart the server to apply.
 
 ## Notes & next steps
 

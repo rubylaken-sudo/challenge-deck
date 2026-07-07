@@ -50,9 +50,6 @@
   .desc{font-size:12.5px;color:oklch(0.66 0.015 265);line-height:1.35}
   .btn{font-size:12.5px;font-weight:500;padding:7px 14px;border-radius:8px;background:transparent;color:oklch(0.74 0.015 265);border:1px solid oklch(0.36 0.013 265);flex:none}
   .card.active .btn{background:var(--accent);color:#0a160c;border-color:var(--accent);font-weight:600;letter-spacing:.3px}
-  .timer{font-family:'JetBrains Mono',monospace;font-size:13px;font-weight:600;color:var(--accent);flex:none;min-width:48px;text-align:right;font-variant-numeric:tabular-nums}
-  .addmin{font-family:'JetBrains Mono',monospace;font-size:11px;font-weight:600;color:oklch(0.72 0.015 265);background:oklch(0.26 0.014 265);border:1px solid oklch(0.34 0.013 265);border-radius:7px;padding:6px 9px;flex:none;cursor:pointer}
-  .addmin:hover{background:oklch(0.3 0.015 265);color:#fff}
 </style>
 </head>
 <body>
@@ -82,10 +79,7 @@
   let challenges = [];
   let ws;
 
-  function fmt(ms) {
-    const t = Math.max(0, Math.ceil(ms / 1000));
-    return Math.floor(t / 60) + ':' + String(t % 60).padStart(2, '0');
-  }
+
 
   function render() {
     const active = challenges.filter(c => c.active).length;
@@ -96,7 +90,6 @@
     document.getElementById('liveLabel').textContent = active > 0 ? 'LIVE' : 'IDLE';
 
     listEl.innerHTML = '';
-    const now = Date.now();
     for (const c of challenges) {
       const card = document.createElement('div');
       card.className = 'card' + (c.active ? ' active' : '');
@@ -107,24 +100,10 @@
       card.querySelector('.tag').textContent = c.tag;
       card.querySelector('.title').textContent = c.title;
       card.querySelector('.desc').textContent = c.sub;
-
-      if (c.active && c.duration > 0 && c.endsAt) {
-        const timer = document.createElement('span');
-        timer.className = 'timer';
-        timer.textContent = fmt(c.endsAt - now);
-        card.appendChild(timer);
-        const add = document.createElement('button');
-        add.className = 'addmin';
-        add.textContent = '+1:00';
-        add.addEventListener('click', (e) => { e.stopPropagation(); send({ type: 'addtime', id: c.id, seconds: 60 }); });
-        card.appendChild(add);
-      }
-
       const btn = document.createElement('div');
       btn.className = 'btn';
       btn.textContent = c.active ? 'On Air' : 'Activate';
       card.appendChild(btn);
-
       card.addEventListener('click', () => send({ type: 'toggle', id: c.id }));
       listEl.appendChild(card);
     }
@@ -148,11 +127,6 @@
     };
   }
   connect();
-
-  // Tick once a second so visible countdowns stay current between server messages.
-  setInterval(() => {
-    if (challenges.some(c => c.active && c.duration > 0 && c.endsAt)) render();
-  }, 1000);
 </script>
 </body>
 </html>
