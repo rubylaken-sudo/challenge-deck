@@ -36,6 +36,7 @@ let challenges = [
   { id: 6,  tag: 'BUILD', title: 'Drop all Loot',    sub: 'Drop your entire inventory on command', active: false },
   { id: 7,  tag: 'CHILL', title: 'No Challenges This Match', sub: 'A free match — no challenges allowed', active: false },
   { id: 8,  tag: 'PACE',  title: 'Random Fill Game', sub: 'Queue with random fills for the match', active: false },
+  { id: 9,  tag: 'STYLE', title: 'Choose My Sprite', sub: 'Chat picks the sprite for the next match', active: false },
 ];
 
 // ---- Static file server ----------------------------------------------------
