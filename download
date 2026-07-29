@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Challenge Deck — Overlay</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  /*
+    Transparent overlay for OBS.
+    Customise with URL params on the Browser Source URL, e.g.
+      /overlay?corner=top-right&accent=%235ff771&tags=0
+    corner: top-left | top-right | bottom-left | bottom-right
+    accent: any CSS color (url-encode the #, e.g. %23ff3b6b)
+    tags:   1 (show category tags) | 0 (hide)
+  */
+  *{box-sizing:border-box;margin:0;padding:0}
+  :root{ --accent:#5ff771; }
+  html,body{height:100%;background:transparent}
+  body{font-family:'Space Grotesk',sans-serif;overflow:hidden}
+  @keyframes cd-pulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.35;transform:scale(.82)}}
+  @keyframes cd-in{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+  #panel{
+    position:fixed;width:320px;max-width:42vw;padding:16px 18px;border-radius:14px;
+    background:oklch(0.15 0.012 265 / 0.82);
+    -webkit-backdrop-filter:blur(10px);backdrop-filter:blur(10px);
+    border:1px solid oklch(0.45 0.01 265 / 0.4);
+    box-shadow:0 14px 44px oklch(0 0 0 / 0.5);
+    color:#fff;
+    transition:opacity .3s ease;
+  }
+  #panel.hidden{opacity:0;pointer-events:none}
+  .head{display:flex;align-items:center;gap:9px;padding-bottom:11px;margin-bottom:12px;border-bottom:1px solid oklch(0.4 0.01 265 / 0.35)}
+  .head .dot{width:8px;height:8px;border-radius:50%;background:oklch(0.64 0.21 25);animation:cd-pulse 1.4s ease-in-out infinite;flex:none}
+  .head .ttl{font-family:'JetBrains Mono',monospace;font-size:11px;font-weight:600;letter-spacing:1.5px;flex:1}
+  .head .cnt{font-family:'JetBrains Mono',monospace;font-size:11px;font-weight:600;color:var(--accent)}
+  .items{display:flex;flex-direction:column;gap:10px}
+  .item{display:flex;align-items:flex-start;gap:10px;animation:cd-in .28s ease both}
+  .item .bar{width:3px;align-self:stretch;border-radius:3px;background:var(--accent);flex:none;margin-top:1px}
+  .item .meta{display:flex;flex-direction:column;gap:1px;min-width:0;flex:1}
+  .item .tag{font-family:'JetBrains Mono',monospace;font-size:9px;font-weight:600;letter-spacing:1.5px;color:var(--accent)}
+  .item .title{font-weight:600;font-size:15px;line-height:1.25}
+
+</style>
+</head>
+<body>
+  <div id="panel" class="hidden">
+    <div class="head"><span class="dot"></span><span class="ttl">ACTIVE CHALLENGES</span><span class="cnt" id="cnt">0</span></div>
+    <div class="items" id="items"></div>
+  </div>
+
+<script>
+  const params = new URLSearchParams(location.search);
+  const corner = params.get('corner') || 'top-left';
+  const accent = params.get('accent');
+  const showTags = params.get('tags') !== '0';
+  if (accent) document.documentElement.style.setProperty('--accent', accent);
+
+  const panel = document.getElementById('panel');
+  const pad = '24px';
+  const pos = {
+    'top-left':     { top: pad, left: pad },
+    'top-right':    { top: pad, right: pad },
+    'bottom-left':  { bottom: pad, left: pad },
+    'bottom-right': { bottom: pad, right: pad },
+  }[corner] || { top: pad, left: pad };
+  Object.assign(panel.style, pos);
+
+  const itemsEl = document.getElementById('items');
+  let ws;
+  let latest = [];
+
+  function fmt(ms) {
+    const t = Math.max(0, Math.ceil(ms / 1000));
+    return Math.floor(t / 60) + ':' + String(t % 60).padStart(2, '0');
+  }
+
+  function render(challenges) {
+    const active = challenges.filter(c => c.active);
+    document.getElementById('cnt').textContent = active.length;
+    panel.classList.toggle('hidden', active.length === 0);
+    itemsEl.innerHTML = '';
+    for (const c of active) {
+      const el = document.createElement('div');
+      el.className = 'item';
+      el.innerHTML = '<div class="bar"></div><div class="meta">' +
+        (showTags ? '<span class="tag"></span>' : '') +
+        '<span class="title"></span></div>';
+      if (showTags) el.querySelector('.tag').textContent = c.tag;
+      el.querySelector('.title').textContent = c.title;
+      itemsEl.appendChild(el);
+    }
+  }
+
+  function connect() {
+    const proto = location.protocol === 'https:' ? 'wss' : 'ws';
+    ws = new WebSocket(proto + '://' + location.host);
+    ws.onclose = () => setTimeout(connect, 1000);
+    ws.onerror = () => ws.close();
+    ws.onmessage = (e) => {
+      const msg = JSON.parse(e.data);
+      if (msg.type === 'state') render(msg.challenges);
+    };
+  }
+  connect();
+</script>
+</body>
+</html>
