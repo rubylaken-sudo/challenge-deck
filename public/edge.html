@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Challenge Deck — Edge Panel</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  /*
+    Touch control panel sized for the CORSAIR XENEON EDGE (2560x720, 32:9).
+    Open fullscreen (F11) on the Edge display. Layout is fluid, so it also
+    works on any wide strip or a normal browser window for testing.
+  */
+  *{box-sizing:border-box;margin:0;padding:0}
+  :root{ --accent:#5ff771; }
+  html,body{height:100%;overflow:hidden}
+  body{
+    background:oklch(0.15 0.012 265);
+    color:oklch(0.96 0.005 265);
+    font-family:'Space Grotesk',sans-serif;
+    display:flex;
+    -webkit-user-select:none;user-select:none;
+    -webkit-tap-highlight-color:transparent;
+    touch-action:manipulation;
+  }
+  @keyframes cd-pulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.35;transform:scale(.82)}}
+
+  /* ---- left rail ---- */
+  .rail{
+    width:clamp(190px,13%,320px);flex:none;
+    display:flex;flex-direction:column;gap:2.2vh;
+    padding:2.6vh 1.2vw;
+    border-right:1px solid oklch(0.3 0.013 265);
+  }
+  .brand{display:flex;align-items:center;gap:0.8vw}
+  .mark{
+    width:clamp(34px,3.4vh,52px);aspect-ratio:1;border-radius:22%;
+    background:var(--accent);color:#0a160c;flex:none;
+    display:flex;align-items:center;justify-content:center;
+    font-weight:700;font-size:clamp(17px,2.4vh,26px);
+  }
+  .brand h1{font-size:clamp(13px,1.9vh,20px);font-weight:700;letter-spacing:.4px;line-height:1.15}
+  .brand .sub{font-family:'JetBrains Mono',monospace;font-size:clamp(9px,1.2vh,12px);letter-spacing:1.2px;color:oklch(0.64 0.015 265)}
+
+  .status{
+    display:flex;align-items:center;gap:0.7vw;padding:1.4vh 1vw;border-radius:12px;
+    font-family:'JetBrains Mono',monospace;font-size:clamp(11px,1.5vh,15px);font-weight:600;letter-spacing:1.2px;
+    background:oklch(0.22 0.014 265);border:1px solid oklch(0.3 0.013 265);color:oklch(0.62 0.015 265);
+  }
+  .status .dot{width:clamp(8px,1.1vh,12px);aspect-ratio:1;border-radius:50%;background:oklch(0.45 0.014 265);flex:none}
+  .status.on{background:oklch(0.64 0.21 25 / 0.14);border-color:oklch(0.64 0.21 25 / 0.45);color:oklch(0.8 0.16 25)}
+  .status.on .dot{background:oklch(0.64 0.21 25);animation:cd-pulse 1.4s ease-in-out infinite}
+
+  .tally{display:flex;align-items:baseline;gap:0.5vw;font-family:'JetBrains Mono',monospace}
+  .tally b{font-size:clamp(28px,6vh,60px);font-weight:600;color:var(--accent);line-height:1}
+  .tally span{font-size:clamp(10px,1.4vh,14px);color:oklch(0.64 0.015 265);letter-spacing:1px}
+
+  .rail .spacer{flex:1}
+  .clear{
+    font-family:'Space Grotesk',sans-serif;font-weight:600;
+    font-size:clamp(13px,1.9vh,19px);color:oklch(0.9 0.01 265);
+    background:oklch(0.25 0.014 265);border:1px solid oklch(0.34 0.014 265);
+    padding:2.2vh 1vw;border-radius:14px;cursor:pointer;width:100%;
+  }
+  .clear:active{background:oklch(0.32 0.016 265)}
+  .conn{
+    font-family:'JetBrains Mono',monospace;font-size:clamp(9px,1.2vh,12px);letter-spacing:1.1px;
+    text-align:center;padding:0.9vh 0;border-radius:9px;border:1px solid oklch(0.3 0.013 265);
+    color:oklch(0.6 0.015 265);
+  }
+  .conn.ok{color:var(--accent);border-color:color-mix(in oklab,var(--accent) 45%,transparent)}
+  .conn.bad{color:oklch(0.74 0.17 60);border-color:oklch(0.74 0.17 60 / 0.45)}
+
+  /* ---- tile grid ---- */
+  #grid{
+    flex:1;display:grid;gap:clamp(8px,1.4vh,16px);
+    padding:2.6vh 1.4vw;
+    grid-template-columns:repeat(5,minmax(0,1fr));
+    grid-auto-rows:1fr;
+  }
+  .tile{
+    display:flex;flex-direction:column;justify-content:space-between;
+    gap:0.6vh;padding:1.7vh 1vw;min-height:0;
+    border-radius:16px;cursor:pointer;
+    background:oklch(0.215 0.014 265);
+    border:1px solid oklch(0.3 0.013 265);
+    border-left:5px solid oklch(0.34 0.012 265);
+    transition:background .12s,border-color .12s;
+  }
+  .tile:active{background:oklch(0.26 0.015 265)}
+  .tile.active{
+    background:color-mix(in oklab,var(--accent) 15%,oklch(0.22 0.014 265));
+    border-color:var(--accent);border-left-color:var(--accent);
+  }
+  .tile .tag{
+    font-family:'JetBrains Mono',monospace;font-size:clamp(9px,1.15vh,12px);
+    font-weight:600;letter-spacing:1.4px;color:oklch(0.7 0.015 265);
+  }
+  .tile.active .tag{color:var(--accent)}
+  .tile .title{
+    font-weight:600;font-size:clamp(14px,2.3vh,24px);line-height:1.18;
+    text-wrap:pretty;overflow:hidden;
+  }
+  .tile .state{
+    font-family:'JetBrains Mono',monospace;font-size:clamp(9px,1.2vh,13px);
+    font-weight:600;letter-spacing:1.3px;color:oklch(0.55 0.014 265);
+  }
+  .tile.active .state{color:var(--accent)}
+</style>
+</head>
+<body>
+  <div class="rail">
+    <div class="brand">
+      <div class="mark">C</div>
+      <div>
+        <h1>CHALLENGE<br>DECK</h1>
+        <div class="sub">EDGE PANEL</div>
+      </div>
+    </div>
+    <div id="status" class="status"><span class="dot"></span><span id="statusLabel">IDLE</span></div>
+    <div class="tally"><b id="activeCount">0</b><span>ACTIVE</span></div>
+    <div class="spacer"></div>
+    <button class="clear" id="clearBtn">Clear all</button>
+    <div id="conn" class="conn bad">CONNECTING…</div>
+  </div>
+
+  <div id="grid"></div>
+
+<script>
+  const gridEl = document.getElementById('grid');
+  const connEl = document.getElementById('conn');
+  let challenges = [];
+  let ws;
+
+  function render() {
+    const active = challenges.filter(c => c.active).length;
+    document.getElementById('activeCount').textContent = active;
+    const status = document.getElementById('status');
+    status.classList.toggle('on', active > 0);
+    document.getElementById('statusLabel').textContent = active > 0 ? 'LIVE' : 'IDLE';
+
+    // Keep tiles roughly square-ish: pick a column count that fits the list.
+    const cols = challenges.length > 15 ? 6 : challenges.length > 10 ? 5 : 4;
+    gridEl.style.gridTemplateColumns = 'repeat(' + cols + ',minmax(0,1fr))';
+
+    gridEl.innerHTML = '';
+    for (const c of challenges) {
+      const tile = document.createElement('div');
+      tile.className = 'tile' + (c.active ? ' active' : '');
+      tile.innerHTML = '<span class="tag"></span><span class="title"></span><span class="state"></span>';
+      tile.querySelector('.tag').textContent = c.tag;
+      tile.querySelector('.title').textContent = c.title;
+      tile.querySelector('.state').textContent = c.active ? 'ON AIR' : 'OFF';
+      tile.addEventListener('click', () => send({ type: 'toggle', id: c.id }));
+      gridEl.appendChild(tile);
+    }
+  }
+
+  function send(msg) { if (ws && ws.readyState === 1) ws.send(JSON.stringify(msg)); }
+  document.getElementById('clearBtn').addEventListener('click', () => send({ type: 'clear' }));
+
+  function connect() {
+    const proto = location.protocol === 'https:' ? 'wss' : 'ws';
+    ws = new WebSocket(proto + '://' + location.host);
+    ws.onopen = () => { connEl.textContent = 'CONNECTED'; connEl.className = 'conn ok'; };
+    ws.onclose = () => { connEl.textContent = 'RECONNECTING…'; connEl.className = 'conn bad'; setTimeout(connect, 1000); };
+    ws.onerror = () => ws.close();
+    ws.onmessage = (e) => {
+      const msg = JSON.parse(e.data);
+      if (msg.type === 'state') { challenges = msg.challenges; render(); }
+    };
+  }
+  connect();
+</script>
+</body>
+</html>

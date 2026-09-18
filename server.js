@@ -38,7 +38,11 @@ let challenges = [
   { id: 8,  tag: 'PACE',  title: 'Random Fill Game', sub: 'Queue with random fills for the match', active: false },
   { id: 9,  tag: 'STYLE', title: 'Choose My Sprite', sub: 'Chat picks the sprite for the next match', active: false },
   { id: 10, tag: 'CHAT',  title: 'Voice Changer',    sub: 'Play the match with the voice changer on', active: false },
-  { id: 11, tag: 'SKILL', title: 'Switch to Mouse & Keyboard', sub: 'Switch to mouse and keyboard this game!', active: false },
+  { id: 11, tag: 'SQUAD', title: 'Play Games with FRAME', sub: 'Squad up with FRAME for the next games', active: false },
+  { id: 12, tag: 'LOOT',  title: 'Choose My Loadout',  sub: 'Chat picks the weapons I run this match', active: false },
+  { id: 13, tag: 'STREAM', title: 'Add 1 Extra Hr to the Stream', sub: 'The stream runs one hour longer tonight', active: false },
+  { id: 14, tag: 'WILD',  title: 'Custom Challenge',   sub: 'Chat invents the rule — anything goes', active: false },
+  { id: 15, tag: 'DUEL',  title: '1v1 Round Against Framekeeper', sub: 'Take on Framekeeper in a 1v1 round', active: false },
 ];
 
 // ---- Static file server ----------------------------------------------------
@@ -54,6 +58,7 @@ const server = http.createServer((req, res) => {
   let url = req.url.split('?')[0];
   if (url === '/' || url === '') url = '/control.html';
   if (url === '/overlay' || url === '/overlay/') url = '/overlay.html';
+  if (url === '/edge' || url === '/edge/') url = '/edge.html';
 
   const filePath = path.join(PUBLIC, path.normalize(url).replace(/^(\.\.[/\\])+/, ''));
   if (!filePath.startsWith(PUBLIC)) { res.writeHead(403); return res.end('Forbidden'); }
@@ -96,5 +101,6 @@ wss.on('connection', (ws) => {
 server.listen(PORT, () => {
   console.log(`\n  Challenge Deck running`);
   console.log(`  ├─ Control panel : http://localhost:${PORT}/`);
-  console.log(`  └─ OBS overlay   : http://localhost:${PORT}/overlay\n`);
+  console.log(`  ├─ OBS overlay   : http://localhost:${PORT}/overlay`);
+  console.log(`  └─ Edge panel    : http://localhost:${PORT}/edge\n`);
 });
