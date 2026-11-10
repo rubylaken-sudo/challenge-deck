@@ -43,6 +43,7 @@ let challenges = [
   { id: 13, tag: 'STREAM', title: 'Add 1 Extra Hr to the Stream', sub: 'The stream runs one hour longer tonight', active: false },
   { id: 14, tag: 'WILD',  title: 'Custom Challenge',   sub: 'Chat invents the rule — anything goes', active: false },
   { id: 15, tag: 'DUEL',  title: '1v1 Round Against Framekeeper', sub: 'Take on Framekeeper in a 1v1 round', active: false },
+  { id: 16, tag: 'CHAT',  title: "Don't Say DAMN",   sub: 'Say the word and the challenge is failed', active: false },
 ];
 
 // ---- Static file server ----------------------------------------------------
