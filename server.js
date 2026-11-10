@@ -59,7 +59,6 @@ const server = http.createServer((req, res) => {
   let url = req.url.split('?')[0];
   if (url === '/' || url === '') url = '/control.html';
   if (url === '/overlay' || url === '/overlay/') url = '/overlay.html';
-  if (url === '/edge' || url === '/edge/') url = '/edge.html';
 
   const filePath = path.join(PUBLIC, path.normalize(url).replace(/^(\.\.[/\\])+/, ''));
   if (!filePath.startsWith(PUBLIC)) { res.writeHead(403); return res.end('Forbidden'); }
@@ -102,6 +101,5 @@ wss.on('connection', (ws) => {
 server.listen(PORT, () => {
   console.log(`\n  Challenge Deck running`);
   console.log(`  ├─ Control panel : http://localhost:${PORT}/`);
-  console.log(`  ├─ OBS overlay   : http://localhost:${PORT}/overlay`);
-  console.log(`  └─ Edge panel    : http://localhost:${PORT}/edge\n`);
+  console.log(`  └─ OBS overlay   : http://localhost:${PORT}/overlay\n`);
 });

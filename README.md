@@ -51,23 +51,6 @@ You'll get a URL like `https://your-app.onrender.com`. Then:
 
 WebSockets upgrade to `wss://` automatically over HTTPS — no code changes.
 
-## Touch panel for the CORSAIR XENEON EDGE
-
-The Edge is 2560x720 (32:9) with 5-point touch, and Windows treats it as a normal
-display — so the panel is just a browser window on it.
-
-1. Open **http://localhost:8080/edge** (or `https://your-app.onrender.com/edge`)
-   in a browser window, drag that window onto the Edge display.
-2. Press **F11** for fullscreen. Big tiles, one tap = challenge on/off.
-
-The grid picks its column count from how many challenges you have (4/5/6 wide)
-and scales type to the strip, so it stays legible without any tuning. It talks
-to the same server as the desktop control panel and the overlay, so all three
-stay in sync — tap a tile on the Edge, it shows up on stream instantly.
-
-Tip: Chrome/Edge → menu → **Cast, save and share → Install page as app** gives
-you a chrome-less window that remembers which display it was on.
-
 ## Customise the overlay
 
 Add query params to the **overlay** URL in OBS:
