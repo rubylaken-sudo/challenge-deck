@@ -43,7 +43,6 @@ let challenges = [
   { id: 13, tag: 'STREAM', title: 'Add 1 Extra Hr to the Stream', sub: 'The stream runs one hour longer tonight', active: false },
   { id: 14, tag: 'WILD',  title: 'Custom Challenge',   sub: 'Chat invents the rule — anything goes', active: false },
   { id: 15, tag: 'DUEL',  title: '1v1 Round Against Framekeeper', sub: 'Take on Framekeeper in a 1v1 round', active: false },
-  { id: 16, tag: 'CHAT',  title: "Don't Say DAMN",   sub: 'Say the word and the challenge is failed', active: false },
 ];
 
 // ---- Static file server ----------------------------------------------------
@@ -59,6 +58,7 @@ const server = http.createServer((req, res) => {
   let url = req.url.split('?')[0];
   if (url === '/' || url === '') url = '/control.html';
   if (url === '/overlay' || url === '/overlay/') url = '/overlay.html';
+  if (url === '/edge' || url === '/edge/') url = '/edge.html';
 
   const filePath = path.join(PUBLIC, path.normalize(url).replace(/^(\.\.[/\\])+/, ''));
   if (!filePath.startsWith(PUBLIC)) { res.writeHead(403); return res.end('Forbidden'); }
@@ -101,5 +101,6 @@ wss.on('connection', (ws) => {
 server.listen(PORT, () => {
   console.log(`\n  Challenge Deck running`);
   console.log(`  ├─ Control panel : http://localhost:${PORT}/`);
-  console.log(`  └─ OBS overlay   : http://localhost:${PORT}/overlay\n`);
+  console.log(`  ├─ OBS overlay   : http://localhost:${PORT}/overlay`);
+  console.log(`  └─ Edge panel    : http://localhost:${PORT}/edge\n`);
 });
