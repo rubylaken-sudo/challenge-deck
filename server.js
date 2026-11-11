@@ -46,6 +46,9 @@ let challenges = [
   { id: 16, tag: 'CHAT',  title: "Don't Say DAMN",   sub: 'Say the word and the challenge is failed', active: false },
 ];
 
+// Keep every panel (control, edge, overlay) in alphabetical order by title.
+challenges.sort((a, b) => a.title.localeCompare(b.title, undefined, { numeric: true }));
+
 // ---- Static file server ----------------------------------------------------
 const MIME = {
   '.html': 'text/html; charset=utf-8',
